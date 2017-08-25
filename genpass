@@ -1,0 +1,3 @@
+echo "Enter the password 👀";
+read -s p; echo $p | md5sum | base64 | cut -c -128
+echo "Copy it and clear the console 🙄";

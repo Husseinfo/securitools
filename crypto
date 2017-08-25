@@ -1,0 +1,37 @@
+#!/bin/bash
+
+#Check arguments
+if [ $# -lt 2 ] || ([ $1 != "-e" ] && [ $1 != "-d" ]); then
+	echo "⚠️  Usage: crypto [-e file_to_encrypt | -d file_to_decrypt]"
+	exit 1
+fi
+
+#Encryption
+if [ $1 = '-e' ]; then
+	echo "🔒  Encrypting $2 using AES with 256 bit key length in CBC mode"
+	openssl enc -aes-256-cbc -e -in $2 -out $2.enc
+	#Check encryption result
+	res=$(find . -maxdepth 1 -name "$2"".enc")
+	if [[ $res == "./$2"".enc" ]]; then
+		echo "✅  $2 is encrypted as $2.enc"
+		exit 0
+	else
+		echo "❌  Encryption failed"
+		exit 1
+	fi
+fi
+#Decryption
+echo "🔓  Decrypting $2 using AES with 256 bit key length in CBC mode"
+dec=$2.dec
+if [[ "$2" == *.enc ]]; then
+	dec="$(echo "$2" | rev | cut -d"." -f2- | rev)"
+fi
+openssl enc -aes-256-cbc -d -in $2 -out $dec
+#Check decryption result
+res=$(find . -maxdepth 1 -name "$dec")
+if [[ $res == "./""$dec" ]]; then
+	echo "✅  $2 is decrypted as $dec"
+	exit 0
+else
+        echo "❌  Decryption failed"
+fi
